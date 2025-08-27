@@ -5,6 +5,18 @@ class LeitorArquivo():
         self.arquivo = arquivo
         self.nome_arquivo, self.extensao_arquivo = os.path.splitext(arquivo.filename)
 
-    #Só aceitar PDF, TXT ou DOCX
-    def ler_arquivo(self):
+
+    def ler_pdf(self):
+        pass
+
+
+    def ler_img(self):
+        pass
+
+
+    def ler_txt(self):
+        pass
+
+
+    def ler_docx(self):
         pass 
