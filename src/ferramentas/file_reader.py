@@ -3,15 +3,15 @@ import PyPDF2
 import re
 from .musica import transpoe_cifra
 
-regex_cifra_linha = re.compile(
-    r"^(\s*[A-G](#|b)?(m|M|maj|min|dim|aug|sus|add|º|°)?[0-9]*(?:/[A-G](#|b)?[0-9]*)?\s*)+$"
+# Regex aprimorada para encontrar um acorde individualmente, com grupo para o baixo
+regex_acorde_individual = re.compile(
+    r'\b([A-G][b#]?)((?:m|M|maj|min|dim|aug|sus|add|º|°)?[0-9]*\+?(?:\([0-9]+\))?)(?:\/([A-G][b#]?))?\b'
 )
 
 class LeitorArquivo():
     def __init__(self, arquivo):
         self.arquivo = arquivo
         self.nome_arquivo, self.extensao_arquivo = os.path.splitext(arquivo.filename)
-
 
     def ler_pdf(self, tom_origem=None, tom_destino=None):
         conteudo_pdf = PyPDF2.PdfReader(self.arquivo.stream)
@@ -23,22 +23,20 @@ class LeitorArquivo():
 
         linhas_transpostas = cifra_transposta.split("\n")
         cifra_musica_formatada = ""
-        inicio_musica = -1
+        
+        for linha in linhas_transpostas:
+            # Substitui todos os acordes e espaços por uma string vazia.
+            # Se o resultado for uma string vazia, a linha original continha apenas acordes.
+            linha_sem_acordes = regex_acorde_individual.sub('', linha).strip()
 
-        for idx, linha in enumerate(linhas_transpostas):
-            if inicio_musica == -1 and regex_cifra_linha.match(linha.strip()):
-                inicio_musica = idx
-            
-            if inicio_musica != -1:
-                # Se a linha contiver apenas acordes, adicione a tag 'acorde'
-                if regex_cifra_linha.match(linha.strip()):
-                    cifra_musica_formatada += f"<span class='acorde'>{linha}</span>\n"
-                else:
-                    # Caso contrário, adicione a tag 'letra'
-                    cifra_musica_formatada += f"<span class='letra'>{linha}</span>\n"
+            if not linha_sem_acordes:
+                # Se a linha contiver apenas acordes e espaços, adicione a tag 'acorde'
+                cifra_musica_formatada += f"<span class='acorde'>{linha}</span>\n"
+            else:
+                # Caso contrário, adicione a tag 'letra'
+                cifra_musica_formatada += f"<span class='letra'>{linha}</span>\n"
         
         return cifra_musica_formatada.strip()
-
 
     def ler_img(self):
         return None
