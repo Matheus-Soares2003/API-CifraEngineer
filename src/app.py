@@ -1,18 +1,17 @@
 from flask import Flask, request, jsonify
 from ferramentas.file_reader import LeitorArquivo
-from ferramentas.musica import Musica
 
 app = Flask(__name__)
 
-def arquivo_handler(arq, musica):
+def arquivo_handler(arq, tom_origem, tom_destino):
 
-    leitor_arq = LeitorArquivo(arq, musica_info=musica)
+    leitor_arq = LeitorArquivo(arq)
 
     extensao_arquivo = leitor_arq.extensao_arquivo
     arquivo_tratado = None
 
     if extensao_arquivo == ".pdf":
-        arquivo_tratado = leitor_arq.ler_pdf()
+        arquivo_tratado = leitor_arq.ler_pdf(tom_origem, tom_destino)
     elif extensao_arquivo == ".png" or extensao_arquivo == ".jpg":
         arquivo_tratado = leitor_arq.ler_img()
     elif extensao_arquivo == ".txt":
@@ -24,27 +23,27 @@ def arquivo_handler(arq, musica):
     
     return arquivo_tratado
 
+
 @app.route("/upload", methods=["POST"])
 def upload():
     if "arquivo" not in request.files:
-        return jsonify({"message": "<h1 class='erro'>Nenhum arquivo enviado</h1>"}), 400
+        return "<h1 class='erro'>Nenhum arquivo enviado</h1>", 400
 
     arquivo = request.files["arquivo"]
     tom_original = request.form.get("tom_original")
-    nome_musica = request.form.get("nome_musica")
-    compositor = request.form.get("compositor")
+    tom_destino = request.form.get("tom_destino")
 
     if not tom_original:
-        return jsonify({"message": "<h1 class='erro'>Informe o tom em que a música está</h1>"}), 400
+        return "<h1 class='erro'>Informe o tom em que a música está</h1>", 400
 
-    musica = Musica(tom_original, nome_musica, compositor)
-    resposta = arquivo_handler(arquivo, musica)
+    resposta = arquivo_handler(arquivo, tom_original, tom_destino)
+    print(resposta)
 
     if resposta:
-        return jsonify({"message": resposta}), 200
+        return f"""<pre>\n{resposta}\n</pre>""", 200
     
-    return jsonify({"message": "<h1 class='erro'>ERRO INESPERADO!</h1>"}), 500
+    return "<h1 class='erro'>ERRO INESPERADO!</h1>", 500
     
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
