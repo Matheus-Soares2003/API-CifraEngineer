@@ -27,22 +27,22 @@ def arquivo_handler(arq, tom_origem, tom_destino):
 @app.route("/upload", methods=["POST"])
 def upload():
     if "arquivo" not in request.files:
-        return "<h1 class='erro'>Nenhum arquivo enviado</h1>", 400
+        return jsonify({"message": "<h1 class='erro'>Nenhum arquivo enviado</h1>"}), 400
 
     arquivo = request.files["arquivo"]
     tom_original = request.form.get("tom_original")
     tom_destino = request.form.get("tom_destino")
 
     if not tom_original:
-        return "<h1 class='erro'>Informe o tom em que a música está</h1>", 400
+        return jsonify({"message": "<h1 class='erro'>Informe o tom em que a música está</h1>"}), 400
 
     resposta = arquivo_handler(arquivo, tom_original, tom_destino)
     print(resposta)
 
     if resposta:
-        return f"""<pre>\n{resposta}\n</pre>""", 200
+        return jsonify({"message": f"""<pre>\n{resposta}\n</pre>"""}), 200
     
-    return "<h1 class='erro'>ERRO INESPERADO!</h1>", 500
+    return jsonify({"message": "<h1 class='erro'>ERRO INESPERADO!</h1>"}), 500
     
 
 if __name__ == "__main__":
