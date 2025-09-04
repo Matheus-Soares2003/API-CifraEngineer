@@ -40,8 +40,9 @@ regex_cifra_linha = re.compile(
 
 # Regex aprimorada para encontrar um acorde individualmente, com grupo para o baixo
 regex_acorde_individual = re.compile(
-    r'\b([A-G][b#]?)((?:m|M|maj|min|dim|aug|sus|add|º|°)?[0-9]*\+?(?:\([0-9]+\))?)(?:\/([A-G][b#]?))?\b'
+    r'(?<!\w)([A-G][b#]?)((?:m|M|maj|min|dim|aug|sus|add|º|°)?[0-9]*\+?(?:\([0-9]+\))?)(?:\/([A-G][b#]?))?(?!\w)'
 )
+
 
 def transpoe_cifra(cifra_completa, tom_origem, tom_destino):
     """
@@ -74,6 +75,7 @@ def transpoe_cifra(cifra_completa, tom_origem, tom_destino):
 
     for linha in linhas_originais:
         # Usa re.sub com uma função para processar cada acorde encontrado
+        nova_linha = linha
         def substitui_acorde(match):
             base_acorde = match.group(1)
             modificador = match.group(2) if match.group(2) else ""
@@ -103,7 +105,11 @@ def transpoe_cifra(cifra_completa, tom_origem, tom_destino):
             return novo_acorde_base + modificador + novo_baixo
 
         # Substitui os acordes na linha, preservando o espaçamento
-        nova_linha = regex_acorde_individual.sub(substitui_acorde, linha)
+        linha_sem_acordes = regex_acorde_individual.sub('', linha).strip()
+
+        if not linha_sem_acordes:
+            nova_linha = regex_acorde_individual.sub(substitui_acorde, linha)
+        
         nova_cifra_linhas.append(nova_linha)
     
     return "\n".join(nova_cifra_linhas)
