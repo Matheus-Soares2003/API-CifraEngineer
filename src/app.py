@@ -5,13 +5,13 @@ app = Flask(__name__)
 
 def arquivo_handler(arq, tom_origem, tom_destino):
 
-    leitor_arq = LeitorArquivo(arq)
+    leitor_arq = LeitorArquivo(arq, tom_origem, tom_destino)
 
     extensao_arquivo = leitor_arq.extensao_arquivo
     arquivo_tratado = None
 
     if extensao_arquivo == ".pdf":
-        arquivo_tratado = leitor_arq.ler_pdf(tom_origem, tom_destino)
+        arquivo_tratado = leitor_arq.ler_pdf()
     elif extensao_arquivo == ".png" or extensao_arquivo == ".jpg":
         arquivo_tratado = leitor_arq.ler_img()
     elif extensao_arquivo == ".txt":
