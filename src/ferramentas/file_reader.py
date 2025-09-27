@@ -11,10 +11,14 @@ class LeitorArquivo():
     def ler_pdf(self):
         conteudo_pdf = PyPDF2.PdfReader(self.arquivo.stream)
         musica_completa = ""
-        for page in conteudo_pdf.pages:
+        for cont, page in enumerate(conteudo_pdf.pages):
             cifra = page.extract_text()
-            musica_completa += achar_inicio_musica(cifra)
-        
+            
+            if cont == 0: #Se for a primeira pagina acha onde começa a musica e pega o conteudo do inicio ao final da pagina
+                musica_completa += achar_inicio_musica(cifra)
+            else: #Se ja estiver na segunda pagina significa que já estamos no meio da musica, entao não é necessário achar onde ela começa
+                musica_completa += cifra
+
         return musica_completa 
 
 
