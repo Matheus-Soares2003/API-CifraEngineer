@@ -41,10 +41,8 @@ regex_cifra_linha = re.compile(
 )
 
 # Regex aprimorada para encontrar um acorde individualmente, com grupo para o baixo
-regex_acorde_individual = re.compile(
-    r'(?<!\w)([A-G][b#]?)((?:m|M|maj|min|dim|aug|sus|add|º|°)?[0-9]*\+?(?:\([0-9]+\))?)(?:\/([A-G][b#]?))?(?!\w)'
-)
-
+regex_acorde_individual = re.compile(r'(?<!\w)([A-G][b#]?)((?:m|M|maj|min|dim|aug|sus|add|º|°)?[0-9]*\+?(?:\([0-9]+\))?)(?:\/([A-G][b#]?))?(?!\w)')
+regex_texto_nao_musical = re.compile(r"^\s*(\d{2}\/\d{2}\/\d{4}),\s(\d{2}:\d{2})\s(.+?)\s-\s(.+)$")
 
 def transpoe_cifra(cifra_completa, tom_origem, tom_destino):
     """
@@ -150,6 +148,11 @@ def html_parser_cifra(cifra: str):
             cifra_musica_formatada += f"<span class='acorde'>{linha}</span>\n"
         else:
             # Caso contrário, adicione a tag 'letra'
-            cifra_musica_formatada += f"<span class='letra'>{linha}</span>\n"
+            match = regex_texto_nao_musical.match(linha)
+            if not match:
+                print(linha)
+                linha_formatada = ""
+                linha_formatada = re.sub(r'^.*?\d+/\d+\s*', '', linha).strip()
+                cifra_musica_formatada += f"<span class='letra'>{linha_formatada}</span>\n"
     
     return cifra_musica_formatada.strip()
