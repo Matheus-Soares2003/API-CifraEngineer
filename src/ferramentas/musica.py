@@ -126,14 +126,11 @@ def normaliza_tom(tom_origem, tom_destino):
 def achar_inicio_musica(cifra: str):
     cifra_lista = cifra.split("\n")
     musica_completa = ""
-    inicio_musica = -1
 
     for idx, linha in enumerate(cifra_lista):
         linha_sem_acordes = regex_acorde_individual.sub('', linha).strip()
-        if not linha_sem_acordes and inicio_musica == -1 and linha.strip() != "":
-            inicio_musica = idx
-        if inicio_musica != -1:
-            musica_completa += "\n".join(cifra_lista[idx:])
+        if not linha_sem_acordes and linha.strip() != "":
+            musica_completa = "\n".join(cifra_lista[idx:])
             break
 
     return musica_completa
