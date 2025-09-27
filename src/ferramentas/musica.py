@@ -6,12 +6,14 @@ escalas = {
     "C#": ["C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "C"],
     "D": ["D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "C", "C#"],
     "D#": ["D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "C", "C#", "D"],
+    "Eb": ["Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "C", "C#", "D"],
     "E": ["E", "F", "F#", "G", "G#", "A", "Bb", "B", "C", "C#", "D", "D#"],
     "F": ["F", "F#", "G", "G#", "A", "Bb", "B", "C", "C#", "D", "D#", "E"],
     "F#": ["F#", "G", "G#", "A", "Bb", "B", "C", "C#", "D", "D#", "E", "F"],
     "G": ["G", "G#", "A", "Bb", "B", "C", "C#", "D", "D#", "E", "F", "F#"],
     "G#": ["G#", "A", "Bb", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G"],
     "A": ["A", "Bb", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
+    "A#": ["A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A"],
     "Bb": ["Bb", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A"],
     "B": ["B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb"]
 }
@@ -24,10 +26,10 @@ escala_menor = {
 normalizacao = {
     "B#": "C",
     "Db": "C#",
-    "Eb": "D#",
+    #"Eb": "D#",
     "Gb": "F#",
     "Ab": "G#",
-    "A#": "Bb",
+    #"A#": "Bb",
     "Cb": "B",
     "E#": "F",
     "Fb": "E"
@@ -58,12 +60,7 @@ def transpoe_cifra(cifra_completa, tom_origem, tom_destino):
     """
     
     # Normaliza os tons de origem e destino
-    tom_origem = normalizacao.get(tom_origem, tom_origem)
-    tom_destino = normalizacao.get(tom_destino, tom_destino)
-
-    # Converte os tons menores para seus relativos maiores para o cálculo
-    tom_origem_maior = escala_menor.get(tom_origem, tom_origem)
-    tom_destino_maior = escala_menor.get(tom_destino, tom_destino)
+    tom_origem_maior, tom_destino_maior = normaliza_tom(tom_origem, tom_destino)
 
     # Verifica se os tons existem nas escalas
     if tom_origem_maior not in escalas or tom_destino_maior not in escalas:
@@ -74,7 +71,6 @@ def transpoe_cifra(cifra_completa, tom_origem, tom_destino):
     nova_cifra_linhas = []
 
     for linha in linhas_originais:
-        # Usa re.sub com uma função para processar cada acorde encontrado
         nova_linha = linha
         def substitui_acorde(match):
             base_acorde = match.group(1)
@@ -113,3 +109,50 @@ def transpoe_cifra(cifra_completa, tom_origem, tom_destino):
         nova_cifra_linhas.append(nova_linha)
     
     return "\n".join(nova_cifra_linhas)
+
+
+def normaliza_tom(tom_origem, tom_destino):
+    # Normaliza os tons de origem e destino
+    tom_origem_normalizado = normalizacao.get(tom_origem, tom_origem)
+    tom_destino_normalizado = normalizacao.get(tom_destino, tom_destino)
+
+    # Converte os tons menores para seus relativos maiores para o cálculo
+    tom_origem_maior = escala_menor.get(tom_origem_normalizado, tom_origem_normalizado)
+    tom_destino_maior = escala_menor.get(tom_destino_normalizado, tom_destino_normalizado)
+
+    return tom_origem_maior, tom_destino_maior
+
+
+def achar_inicio_musica(cifra: str):
+    cifra_lista = cifra.split("\n")
+    musica_completa = ""
+    inicio_musica = -1
+
+    for idx, linha in enumerate(cifra_lista):
+        linha_sem_acordes = regex_acorde_individual.sub('', linha).strip()
+        if not linha_sem_acordes and inicio_musica == -1 and linha.strip() != "":
+            inicio_musica = idx
+        if inicio_musica != -1:
+            musica_completa += "\n".join(cifra_lista[idx:])
+            break
+
+    return musica_completa
+
+
+def html_parser_cifra(cifra: str):
+    linhas_cifra = cifra.split("\n")
+    cifra_musica_formatada = ""
+    
+    for linha in linhas_cifra:
+        # Substitui todos os acordes e espaços por uma string vazia.
+        # Se o resultado for uma string vazia, a linha original continha apenas acordes.
+        linha_sem_acordes = regex_acorde_individual.sub('', linha).strip()
+
+        if not linha_sem_acordes:
+            # Se a linha contiver apenas acordes e espaços, adicione a tag 'acorde'
+            cifra_musica_formatada += f"<span class='acorde'>{linha}</span>\n"
+        else:
+            # Caso contrário, adicione a tag 'letra'
+            cifra_musica_formatada += f"<span class='letra'>{linha}</span>\n"
+    
+    return cifra_musica_formatada.strip()
