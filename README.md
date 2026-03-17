@@ -8,10 +8,10 @@ O projeto foi construído utilizando **Flask**, com organização modular e supo
 
 ## Funcionalidades
 
-* 📥 Leitura de arquivos contendo cifras musicais (no momento apenas arquivos .txt e .pdf)
-* 🔄 Transposição de acordes (alterar o tom de uma música)
-* 🌐 Exposição de endpoints via API REST
-* ⚙️ Organização modular para fácil manutenção e evolução
+* Leitura de arquivos contendo cifras musicais (no momento apenas arquivos .txt e .pdf)
+* Transposição de acordes (alterar o tom de uma música)
+* Exposição de endpoints via API REST
+* Organização modular para fácil manutenção e evolução
 
 ---
 
@@ -122,7 +122,7 @@ No corpo (enviar como form-data):
 * Devolver a resposta em um arquivo JSON
 
 ---
-## 👨‍💻 Autor
+## Autor
 
 Matheus Soares Thomaz Cabral
 https://www.linkedin.com/in/matheusstcabral
